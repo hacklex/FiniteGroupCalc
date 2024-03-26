@@ -40,7 +40,17 @@ namespace FiniteGroupCalc
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual ulong GetIth(int i) => (ulong)i;
 
-        public ulong[] GetBasisWithInverses(ulong[] basis)
+        /// <summary>
+        /// When calculating the diameter stats, skip generator sets that don't generate the full group
+        /// </summary>
+        public bool SkipNonFullGenerators { get; set; }
+        /// <summary>
+        /// How many elements to take as generator sets for the diameter statistics 
+        /// </summary>
+        [Description("How many elements to take as generator sets for the diameter statistics")]
+        public int DiameterStatsBasisSize { get; set; } = 2;
+        public bool AddInversesToDiameterStatsBases { get; set; } = false;
+        public virtual ulong[] GetBasisWithInverses(ulong[] basis)
         { 
             var key = $"{CacheId}_inverses_[{basis.AsString()}]";
             if (PersistableUlongListCacher.Contains(key))

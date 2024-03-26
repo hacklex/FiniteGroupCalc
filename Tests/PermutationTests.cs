@@ -8,6 +8,19 @@ namespace FiniteGroupCalc.Tests
     public class PermutationTests
     {
         [TestMethod]
+        public void InversionWorks()
+        {
+            var proc = new PermutationProcessor();
+            proc.Order = 4;
+            var all = Enumerable.Range(0, 24).Select(proc.GetIth).ToArray();
+            for (int i = 0; i < 24; i++)
+            {
+                var inv = proc.InvertPerm(all[i]);
+                Assert.AreEqual(proc.Identity, proc.Product(all[i], inv));
+                Assert.AreEqual(proc.Identity, proc.Product(inv, all[i]));
+            }
+        }
+        [TestMethod]
         public void PermutationIndexIsCorrect()
         {
             var testOrder = 10;

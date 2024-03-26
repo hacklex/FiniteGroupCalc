@@ -36,7 +36,11 @@ namespace FiniteGroupCalc
             processor.Order = 3;
             if (processor is TriangularZnMatrixProcessor up) up.BitsPerElement = 3;
         }
-        private void _processorComboBox_SelectedIndexChanged(object sender, EventArgs e) => _properties.SelectedObject = _processorComboBox.SelectedItem;
+        private void _processorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _properties.SelectedObject = _processorComboBox.SelectedItem;
+            _testButton.Enabled = _randomWalksButton.Enabled = _processorComboBox.SelectedItem is not PermutationProcessor;
+        }
 
         async Task<Func<ulong[,], ulong, ulong, ulong>> CompileEstimate(string functionString, string cName = "C", string orderName = "N", string iName = "k")
         {
@@ -222,22 +226,69 @@ namespace FiniteGroupCalc
             viewer.ShowDialog();
         }
 
+        IEnumerable<List<ulong>> GetGeneratorSets(UlongProcessorBase processor, int setSize)
+        {
+            IEnumerable<List<ulong>> GetSubset(int fromIndex, int setSize)
+            {
+                if (setSize == 0) yield break;
+                if (setSize == 1)                
+                    for (int i = fromIndex; i < (int)processor.UlongCount; i++)                    
+                        yield return [processor.GetIth(i)];
+                else
+                {
+                    for (int i = fromIndex; i < (int)processor.UlongCount-setSize+1; i++)
+                    {
+                        foreach (var sub in GetSubset(i + 1, setSize - 1))
+                        {
+                            List<ulong> gen = [processor.GetIth(i)];
+                            gen.AddRange(sub);
+                            yield return gen;
+                        }
+                    }
+                }
+            }
+            foreach(var el in GetSubset(1, setSize))
+            {
+                yield return el;
+            }
+        }
+
         private async void _elementPairStats_Click(object sender, EventArgs e)
         {
             var processor = _processorComboBox.SelectedItem as UlongProcessorBase;
             if (processor == null) return;
             List<sbyte> diameters = new();
-            for(ulong a = 1; a < processor.UlongCount; a++)
+
+            foreach (var list in GetGeneratorSets(processor, processor.DiameterStatsBasisSize))
             {
-                for (ulong b = a + 1; b < processor.UlongCount; b++)
-                {
-                    var dists = _distanceStatsHelper.GetPartialDistanceTableForBasis(processor, processor.Identity, 
-                        [processor.GetIth((int)a), processor.GetIth((int)b)],
-                        (i, n) => { });
-                    diameters.Add(dists.Max());
-                }
-            } 
+                List<ulong> generatorSet = (processor.AddInversesToDiameterStatsBases)
+                    ? processor.GetBasisWithInverses(list.ToArray()).ToList()
+                    : list;
+
+                var dists = _distanceStatsHelper.GetPartialDistanceTableForBasis(processor, processor.Identity, generatorSet.ToArray(), (i, n) => { });
+                if (processor.SkipNonFullGenerators && Array.IndexOf<sbyte>(dists, -1) != -1) continue;
+                var max = dists.Max();
+                diameters.Add(max);
+            }
+
+            //for(ulong a = 1; a < processor.UlongCount; a++)
+            //{
+            //    for (ulong b = a + 1; b < processor.UlongCount; b++)
+            //    {
+            //        var dists = _distanceStatsHelper.GetPartialDistanceTableForBasis(processor, processor.Identity, 
+            //            [processor.GetIth((int)a), processor.GetIth((int)b)],
+            //            (i, n) => { });
+            //        if (processor.SkipNonFullGenerators && Array.IndexOf<sbyte>(dists, -1) != -1) continue;
+            //        var max = dists.Max();                     
+            //        diameters.Add(max);
+            //    }
+            //}
+            
+
             var histogram = _distanceStatsHelper.GetHistogram(diameters.ToArray());
+            var minKey = histogram.Keys.Min();
+            for (sbyte d = 1; d < minKey; d++)
+                histogram[d] = 0;
             var model = new PlotModel
             {
                 Title = "Diameter Distribution",
@@ -245,13 +296,14 @@ namespace FiniteGroupCalc
                 {
                     new BarSeries
                     {
-                        ItemsSource = histogram,
+                        ItemsSource = histogram.OrderBy(x => x.Key),
                         ValueField = "Value",
                     }, 
                 }
             };
             var plainChartForm = new Form
             {
+                Text = processor.DisplayName,
                 Controls =
                 {
                     new PlotView

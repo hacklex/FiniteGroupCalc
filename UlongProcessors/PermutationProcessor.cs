@@ -30,6 +30,25 @@ namespace FiniteGroupCalc
             return result;
         }
 
+        public ulong InvertPerm(ulong perm)
+        {
+            ulong result = 0;
+            for (int i = 0; i < Order; i++)
+            {
+                int xDigitShift = (int)(perm & 0xf) * 4;
+                perm >>= 4;
+                int resultShift = i * 4;
+                ulong digit = (ulong)i;
+                result |= (digit << xDigitShift);
+            }
+            return result;
+        }
+
+        public override ulong[] GetBasisWithInverses(ulong[] basis)
+        {
+            return basis.Concat(basis.Select(InvertPerm)).Distinct().ToArray();
+        }
+
         public ulong ApplyPermutation(ulong perm, ulong x)
         {
             ulong result = 0;

@@ -42,14 +42,14 @@ namespace FiniteGroupCalc
             _estimateFormula = new TextBox();
             panel2 = new Panel();
             _toolTip = new ToolTip(components);
+            _elementPairStats = new Button();
             panel3 = new Panel();
             panel5 = new Panel();
             panel4 = new Panel();
             _progressBar = new CustomTextProgressBar();
             panel6 = new Panel();
             panel7 = new Panel();
-            _elementPairStats = new Button();
-            button1 = new Button();
+            _randomWalksButton = new Button();
             _testButton = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)_orderLimitUpDown).BeginInit();
@@ -162,6 +162,17 @@ namespace FiniteGroupCalc
             panel2.Size = new Size(148, 23);
             panel2.TabIndex = 17;
             // 
+            // _elementPairStats
+            // 
+            _elementPairStats.Location = new Point(362, 3);
+            _elementPairStats.Name = "_elementPairStats";
+            _elementPairStats.Size = new Size(140, 23);
+            _elementPairStats.TabIndex = 2;
+            _elementPairStats.Text = "N-generated diameters";
+            _toolTip.SetToolTip(_elementPairStats, "Diameter statistics over all possible permutation N-plets as generating sets");
+            _elementPairStats.UseVisualStyleBackColor = true;
+            _elementPairStats.Click += _elementPairStats_Click;
+            // 
             // panel3
             // 
             panel3.Controls.Add(panel5);
@@ -218,7 +229,7 @@ namespace FiniteGroupCalc
             // panel7
             // 
             panel7.Controls.Add(_elementPairStats);
-            panel7.Controls.Add(button1);
+            panel7.Controls.Add(_randomWalksButton);
             panel7.Controls.Add(_testButton);
             panel7.Dock = DockStyle.Bottom;
             panel7.Location = new Point(4, 397);
@@ -226,25 +237,15 @@ namespace FiniteGroupCalc
             panel7.Size = new Size(521, 29);
             panel7.TabIndex = 15;
             // 
-            // _elementPairStats
+            // _randomWalksButton
             // 
-            _elementPairStats.Location = new Point(362, 3);
-            _elementPairStats.Name = "_elementPairStats";
-            _elementPairStats.Size = new Size(140, 23);
-            _elementPairStats.TabIndex = 2;
-            _elementPairStats.Text = "Element Pair Stats";
-            _elementPairStats.UseVisualStyleBackColor = true;
-            _elementPairStats.Click += _elementPairStats_Click;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(155, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(201, 23);
-            button1.TabIndex = 1;
-            button1.Text = "Chart of 1000 walks of 1000 moves";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += _getWalkChart_Click;
+            _randomWalksButton.Location = new Point(155, 3);
+            _randomWalksButton.Name = "_randomWalksButton";
+            _randomWalksButton.Size = new Size(201, 23);
+            _randomWalksButton.TabIndex = 1;
+            _randomWalksButton.Text = "Chart of 1000 walks of 1000 moves";
+            _randomWalksButton.UseVisualStyleBackColor = true;
+            _randomWalksButton.Click += _getWalkChart_Click;
             // 
             // _testButton
             // 
@@ -301,7 +302,7 @@ namespace FiniteGroupCalc
         private CustomTextProgressBar _progressBar;
         private Panel panel7;
         private Button _testButton;
-        private Button button1;
+        private Button _randomWalksButton;
         private Button _elementPairStats;
     }
 }
