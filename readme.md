@@ -18,9 +18,9 @@ See the cachers code in `PersistableCachers` folder for details.
 # Providing your own group
 To calculate some finite group's growth, you will need to provide
 
-* `GetIth(int i)`{:.language-cs} to get the i-th element of the group as a ulong
-* `Product(ulong a, ulong b)`{:.language-cs} to get the product of two elements (not indices!)
-* `GetStandardBasis()`{:.language-cs} to get the standard set of generators of the group
+* `GetIth(int i)` to get the i-th element of the group as a ulong
+* `Product(ulong a, ulong b)` to get the product of two elements (not indices!)
+* `GetStandardBasis()` to get the standard set of generators of the group
 
 See `UlongProcessors.Base.UlongProcessor` for details.
 
